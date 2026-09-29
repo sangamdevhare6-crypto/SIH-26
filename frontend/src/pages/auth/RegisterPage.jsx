@@ -65,12 +65,30 @@ const RegisterPage = () => {
       }
     } catch (err) {
       const respData = err.response?.data;
-      if (respData) {
-        const firstKey = Object.keys(respData)[0];
-        const val = respData[firstKey];
-        setError(Array.isArray(val) ? `${firstKey}: ${val[0]}` : String(val));
+      if (respData && typeof respData === 'object') {
+        // Parse all DRF error shapes into a single readable string
+        const extractMessage = (data) => {
+          // non_field_errors first
+          if (data.non_field_errors) {
+            const v = data.non_field_errors;
+            return Array.isArray(v) ? v[0] : String(v);
+          }
+          // field-level errors
+          const keys = Object.keys(data);
+          if (keys.length > 0) {
+            const key = keys[0];
+            const val = data[key];
+            if (Array.isArray(val)) return `${key}: ${val[0]}`;
+            if (typeof val === 'object') return extractMessage(val);
+            return String(val);
+          }
+          return 'Registration failed. Please check your data and try again.';
+        };
+        setError(extractMessage(respData));
+      } else if (typeof respData === 'string') {
+        setError(respData);
       } else {
-        setError('Registration failed. Please check your data and try again.');
+        setError('Registration failed. Unable to reach the server. Please try again.');
       }
     } finally {
       setLoading(false);

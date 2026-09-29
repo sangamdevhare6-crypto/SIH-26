@@ -30,6 +30,15 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Username defaults to email — check uniqueness here to avoid DB-level 500
+        username = attrs.get('username') or attrs.get('email', '')
+        if username:
+            qs = User.objects.filter(username__iexact=username)
+            if qs.exists():
+                raise serializers.ValidationError(
+                    {"username": "A user with this username/email already exists."}
+                )
         return attrs
 
     def create(self, validated_data):
@@ -60,25 +69,32 @@ class RegisterSerializer(serializers.ModelSerializer):
         from employers.models import Employer
 
         if user.role == 'student':
-            StudentProfile.objects.create(
+            StudentProfile.objects.get_or_create(
                 user=user,
-                full_name=full_name or f"{user.first_name} {user.last_name}".strip() or user.username,
-                phone=user.phone or ''
+                defaults=dict(
+                    full_name=full_name or f"{user.first_name} {user.last_name}".strip() or user.username,
+                    phone=user.phone or ''
+                )
             )
         elif user.role == 'institute':
-            TrainingInstitute.objects.create(
+            TrainingInstitute.objects.get_or_create(
                 user=user,
-                name=organization_name or full_name or f"{user.first_name}'s Institute",
-                contact_person=full_name or user.username,
-                email=user.email,
-                phone=user.phone or ''
+                defaults=dict(
+                    name=organization_name or full_name or f"{user.first_name}'s Institute",
+                    contact_person=full_name or user.username,
+                    email=user.email,
+                    phone=user.phone or ''
+                )
             )
         elif user.role == 'employer':
-            Employer.objects.create(
+            Employer.objects.get_or_create(
                 user=user,
-                company_name=organization_name or full_name or f"{user.first_name}'s Enterprise",
-                contact_person=full_name or user.username,
-                email=user.email,
-                phone=user.phone or ''
+                defaults=dict(
+                    company_name=organization_name or full_name or f"{user.first_name}'s Enterprise",
+                    contact_person=full_name or user.username,
+                    email=user.email,
+                    phone=user.phone or ''
+                )
             )
+        # 'admin' role: no separate profile model needed
         return user

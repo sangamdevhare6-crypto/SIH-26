@@ -13,8 +13,8 @@ Sabse pehle apna code GitHub pe push karo (agar nahi kiya to):
 ```bash
 git init
 git add .
-git commit -m "Initial commit - KaushalSetu AI"
-git remote add origin https://github.com/YOUR_USERNAME/sih-26.git
+git commit -m "Updated code"
+git remote add origin https://github.com/sangamdevhare6-crypto/SIH-26.git
 git push -u origin main
 ```
 
@@ -50,7 +50,7 @@ git push -u origin main
 | `DJANGO_SECRET_KEY` | koi bhi random string (64+ characters) |
 | `DEBUG` | `False` |
 | `DATABASE_URL` | (Step 2.2 ka Internal Database URL paste karo) |
-| `FRONTEND_URL` | (Step 3 ke baad Vercel URL yahan dalna) |
+| `FRONTEND_URL` | (Step 3 ke baad Vercel URL yahan dalna) | 
 
 5. **Create Web Service** click karo
 6. Deploy hone do (5-10 minutes lagenge)
