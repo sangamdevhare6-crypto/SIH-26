@@ -138,5 +138,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://sih-26-d8wf.vercel.app',
+    'https://kaushalsetu-backend-1.onrender.com',
     FRONTEND_URL,
+]
+
+# Allow all Vercel preview deployments (branch previews)
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^https://sih-26.*\.vercel\.app$',
 ]
